@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  "name": "V2StudiobyChar",
+  "compatibility_date": "2026-02-16",
+
+  "assets": {
+    "directory": "./"
+  }
+}
