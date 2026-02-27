@@ -605,6 +605,26 @@ html {
 /* ==========================================================================
    Responsive
    ========================================================================== */
+
+/* Hero background image optimization for different screen sizes */
+@media (max-width: 480px) {
+    .hero-overlay {
+        background-image: url('../images/studiobychar studio by char solar halo-480w.webp') !important;
+    }
+}
+
+@media (max-width: 900px) and (min-width: 481px) {
+    .hero-overlay {
+        background-image: url('../images/studiobychar studio by char solar halo-900w.webp') !important;
+    }
+}
+
+@media (min-width: 901px) {
+    .hero-overlay {
+        background-image: url('../images/studiobychar studio by char solar halo.webp') !important;
+    }
+}
+
 @media (max-width: 900px) {
 
     .grid-2,
