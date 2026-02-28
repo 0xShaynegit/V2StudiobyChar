@@ -100,6 +100,13 @@
     };
     triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
+    // Touch support for mobile
+    triggerEl.ontouchstart = function() {
+      triggerEl.style.transform = "scale(1.15)";
+      if (!isOpen) openWidget();
+    };
+    triggerEl.ontouchend = function() { triggerEl.style.transform = "scale(1)"; };
+
     // --- Trigger tooltip ---
     // Center aligned: bottom positions the BOTTOM edge of the tooltip.
     // translateY(50%) shifts it down by half its height so its CENTER sits at

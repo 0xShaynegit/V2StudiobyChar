@@ -94,6 +94,13 @@
     };
     triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
+    // Touch support for mobile
+    triggerEl.ontouchstart = function() {
+      triggerEl.style.transform = "scale(1.15)";
+      if (!isOpen) openWidget();
+    };
+    triggerEl.ontouchend = function() { triggerEl.style.transform = "scale(1)"; };
+
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
       "position:fixed",
