@@ -84,15 +84,15 @@
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
       "position:fixed",
-      "bottom:" + (bottomOffset + iconSize / 2 - 10) + "px",
-      "left:" + (leftOffset + iconSize / 2 - 50) + "px",
-      "width:100px",
+      "bottom:" + (bottomOffset + iconSize / 2 - 12) + "px",
+      "left:" + (leftOffset + iconSize + 20) + "px",
       "text-align:center",
-      "background:#333",
+      "background:rgba(0,0,0,0.9)",
       "color:#fff",
-      "padding:5px 10px",
+      "padding:8px 12px",
       "border-radius:4px",
-      "font-size:12px",
+      "font-size:13px",
+      "font-weight:500",
       "z-index:10009",
       "opacity:0",
       "pointer-events:none",
@@ -146,18 +146,19 @@
         svgEl.setAttribute("height", iconSize);
       }
 
-      // Create centered tooltip for this channel
+      // Create centered tooltip for this channel (20px right of center)
       var channelTooltip = document.createElement("div");
       channelTooltip.style.cssText = [
         "position:absolute",
         "top:50%",
-        "left:50%",
+        "left:calc(50% + 20px)",
         "transform:translate(-50%, -50%)",
         "background:rgba(0,0,0,0.9)",
         "color:#fff",
-        "padding:4px 8px",
-        "border-radius:3px",
-        "font-size:11px",
+        "padding:8px 12px",
+        "border-radius:4px",
+        "font-size:13px",
+        "font-weight:500",
         "z-index:10008",
         "opacity:0",
         "pointer-events:none",
