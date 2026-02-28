@@ -151,13 +151,13 @@
         svgEl.style.transition = "filter 0.2s ease";
       }
 
-      // Create tooltip positioned 20px from center of icon, aligned to middle vertically
-      var tooltipBottom = bottomOffset + iconSize + itemGap + idx * (iconSize + itemGap) - (iconSize / 2 + 8);
+      // Create tooltip positioned absolutely 20px from center of icon
       var channelTooltip = document.createElement("div");
       channelTooltip.style.cssText = [
-        "position:fixed",
-        "bottom:" + tooltipBottom + "px",
-        "left:" + (leftOffset + (iconSize / 2) + 20) + "px",
+        "position:absolute",
+        "top:50%",
+        "left:" + ((iconSize / 2) + 20) + "px",
+        "transform:translateY(-50%)",
         "background:#C08A74",
         "color:#fff",
         "padding:8px 12px",
@@ -171,11 +171,11 @@
         "white-space:nowrap",
         "font-family:Inter,sans-serif",
         "letter-spacing:0.3px",
-        "transform:scale(0.9)",
+        "transform:scale(0.9) translateY(-50%)",
         "transform-origin:left center"
       ].join(";");
       channelTooltip.textContent = ch.label;
-      document.body.appendChild(channelTooltip);
+      link.appendChild(channelTooltip);
 
       // Show/hide tooltip and color on hover, expand icon
       link.addEventListener("mouseenter", function() {
