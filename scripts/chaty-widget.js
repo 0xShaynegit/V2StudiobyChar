@@ -30,13 +30,14 @@
     }
   ];
 
+  // Sizes reduced 10% from originals
   var isMobile = window.innerWidth <= 480;
-  var iconSize = isMobile ? 40 : 54;
-  var itemGap = isMobile ? 10 : 12;  // gap between icons
-  var bottomOffset = 20;             // distance from bottom of viewport
-  var leftOffset = 20;               // distance from left of viewport
+  var iconSize    = isMobile ? 36 : 49;   // was 40 / 54
+  var itemGap     = isMobile ? 9 : 11;    // was 10 / 12
+  var bottomOffset = 18;                  // was 20
+  var leftOffset   = 18;                  // was 20
 
-  // Main trigger icon – light brown circle, white chat bubble
+  // Main trigger icon – light brown, white chat bubble
   var triggerSvg =
     '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">' +
     '<circle cx="19.5" cy="19.5" r="19.5" fill="#C08A74"/>' +
@@ -46,12 +47,28 @@
     '<circle cx="23.5" cy="19" r="1.25" fill="#C08A74"/>' +
     '</svg>';
 
-  // Close icon – light brown circle, white X
   var closeSvg =
     '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">' +
     '<circle cx="19.5" cy="19.5" r="19.5" fill="#C08A74"/>' +
     '<path d="M25 14L14 25M14 14L25 25" stroke="white" stroke-width="2.5" stroke-linecap="round"/>' +
     '</svg>';
+
+  function tooltipStyle() {
+    return [
+      "background:#C08A74",
+      "color:#fff",
+      "padding:7px 11px",
+      "border-radius:4px",
+      "font-size:13px",
+      "font-weight:300",
+      "pointer-events:none",
+      "white-space:nowrap",
+      "font-family:Inter,sans-serif",
+      "letter-spacing:0.3px",
+      "transition:opacity 0.2s ease, transform 0.2s ease",
+      "opacity:0"
+    ].join(";");
+  }
 
   function createWidget() {
     var isOpen = false;
@@ -76,51 +93,40 @@
     ].join(";");
     triggerEl.innerHTML = triggerSvg;
 
-    // Hover scale, expand, and open widget (trigger button stays brown, no grayscale)
+    // Hover: scale + open icons (trigger stays brown)
     triggerEl.onmouseenter = function() {
       triggerEl.style.transform = "scale(1.15)";
       if (!isOpen) openWidget();
     };
     triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
-    // Create trigger tooltip positioned 30px from edge of trigger, tooltip top at icon middle
+    // --- Trigger tooltip ---
+    // Center aligned: bottom positions the BOTTOM edge of the tooltip.
+    // translateY(50%) shifts it down by half its height so its CENTER sits at
+    // (bottomOffset + iconSize/2) which is the icon's vertical midpoint.
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
       "position:fixed",
       "bottom:" + (bottomOffset + iconSize / 2) + "px",
-      "left:" + (leftOffset + iconSize + 30) + "px",
-      "text-align:center",
-      "background:#C08A74",
-      "color:#fff",
-      "padding:8px 12px",
-      "border-radius:4px",
-      "font-size:14px",
-      "font-weight:300",
+      "left:" + (leftOffset + iconSize + 20) + "px",
       "z-index:10009",
-      "opacity:0",
-      "pointer-events:none",
-      "transition:opacity 0.3s ease, transform 0.2s ease",
-      "white-space:nowrap",
-      "font-family:Inter,sans-serif",
-      "letter-spacing:0.3px",
-      "transform:scale(0.9)",
-      "transform-origin:left top"
+      "transform:translateY(50%) scale(0.9)",
+      "transform-origin:left center",
+      tooltipStyle()
     ].join(";");
     triggerTooltip.textContent = "Contact us";
     document.body.appendChild(triggerTooltip);
-
     document.body.appendChild(triggerEl);
 
     // --- Channel icons (FIXED, stacked above trigger) ---
     channels.forEach(function(ch, idx) {
       var itemEl = document.createElement("div");
 
-      // Calculate each icon's resting bottom position (above trigger)
       var stackBottom = bottomOffset + iconSize + itemGap + idx * (iconSize + itemGap);
 
       itemEl.style.cssText = [
         "position:fixed",
-        "bottom:" + bottomOffset + "px",   // start at trigger position (hidden)
+        "bottom:" + bottomOffset + "px",
         "left:" + leftOffset + "px",
         "width:" + iconSize + "px",
         "height:" + iconSize + "px",
@@ -134,7 +140,7 @@
 
       var link = document.createElement("a");
       link.href = ch.url;
-      link.target = ch.name === "Phone" ? "_self" : "_blank";
+      link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.setAttribute("aria-label", ch.label);
       link.style.display = "block";
@@ -145,7 +151,6 @@
       link.style.position = "relative";
       link.innerHTML = ch.svg;
 
-      // Make SVG fill the link with grayscale by default
       var svgEl = link.querySelector("svg");
       if (svgEl) {
         svgEl.setAttribute("width", iconSize);
@@ -154,53 +159,41 @@
         svgEl.style.transition = "filter 0.2s ease";
       }
 
-      // Create tooltip positioned absolutely 30px from edge of icon, tooltip top at icon middle
+      // Tooltip: position:absolute inside the link.
+      // top:50% puts its top edge at icon's midpoint.
+      // translateY(-50%) shifts it up by half its own height → tooltip CENTER = icon CENTER.
       var channelTooltip = document.createElement("div");
       channelTooltip.style.cssText = [
         "position:absolute",
         "top:50%",
-        "left:" + (iconSize + 30) + "px",
-        "background:#C08A74",
-        "color:#fff",
-        "padding:8px 12px",
-        "border-radius:4px",
-        "font-size:14px",
-        "font-weight:300",
+        "left:" + (iconSize + 20) + "px",
         "z-index:10008",
-        "opacity:0",
-        "pointer-events:none",
-        "transition:opacity 0.2s ease, transform 0.2s ease",
-        "white-space:nowrap",
-        "font-family:Inter,sans-serif",
-        "letter-spacing:0.3px",
-        "transform:scale(0.9)",
-        "transform-origin:left top"
+        "transform:translateY(-50%) scale(0.9)",
+        "transform-origin:left center",
+        tooltipStyle()
       ].join(";");
       channelTooltip.textContent = ch.label;
       link.appendChild(channelTooltip);
 
-      // Show/hide tooltip and color on hover, expand icon
       link.addEventListener("mouseenter", function() {
         channelTooltip.style.opacity = "1";
-        channelTooltip.style.transform = "scale(1.1)";
+        channelTooltip.style.transform = "translateY(-50%) scale(1.1)";
         itemEl.style.transform = "scale(1.15)";
         if (svgEl) svgEl.style.filter = "grayscale(0%)";
       });
       link.addEventListener("mouseleave", function() {
         channelTooltip.style.opacity = "0";
-        channelTooltip.style.transform = "scale(0.9)";
+        channelTooltip.style.transform = "translateY(-50%) scale(0.9)";
         itemEl.style.transform = "scale(1)";
         if (svgEl) svgEl.style.filter = "grayscale(100%)";
       });
 
-      link.appendChild(channelTooltip);
       itemEl.appendChild(link);
       document.body.appendChild(itemEl);
-
       channelEls.push({ el: itemEl, bottom: stackBottom });
     });
 
-    // --- Toggle function ---
+    // --- Open / Close ---
     function openWidget() {
       isOpen = true;
       triggerEl.innerHTML = closeSvg;
@@ -212,7 +205,6 @@
         item.el.style.pointerEvents = "auto";
       });
 
-      // Auto-close after 30 seconds
       if (autoCloseTimer) clearTimeout(autoCloseTimer);
       autoCloseTimer = setTimeout(function() {
         if (isOpen) closeWidget();
@@ -225,72 +217,48 @@
 
       channelEls.forEach(function(item) {
         item.el.style.transitionDelay = "0s";
-        // Slide off screen downward, not onto trigger button
         item.el.style.bottom = "-" + (iconSize + 10) + "px";
         item.el.style.opacity = "0";
         item.el.style.pointerEvents = "none";
       });
 
-      if (autoCloseTimer) {
-        clearTimeout(autoCloseTimer);
-        autoCloseTimer = null;
-      }
+      if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
     }
 
     triggerEl.onclick = function(e) {
       e.stopPropagation();
-      if (isOpen) {
-        closeWidget();
-      } else {
-        openWidget();
-      }
+      isOpen ? closeWidget() : openWidget();
     };
 
-    // Show tooltip when mouse enters bottom 40% and left 40% corner
-    // Close widget when leaving the zone
+    // --- Corner hover: "Contact us" tooltip + zone-exit close ---
     document.addEventListener("mousemove", function(e) {
-      var viewportHeight = window.innerHeight;
-      var viewportWidth = window.innerWidth;
-      var bottomThreshold = viewportHeight * 0.4; // bottom 40%
-      var leftThreshold = viewportWidth * 0.4;    // left 40%
-
-      var isInBottomArea = e.clientY > (viewportHeight - bottomThreshold);
-      var isInLeftSide = e.clientX < leftThreshold;
-      var isInZone = isInBottomArea && isInLeftSide;
+      var vH = window.innerHeight;
+      var vW = window.innerWidth;
+      var isInZone = e.clientY > vH * 0.6 && e.clientX < vW * 0.4;
 
       if (isInZone && !isOpen) {
         if (!triggerTooltipVisible) {
           triggerTooltip.style.opacity = "1";
-          triggerTooltip.style.transform = "scale(1.1)";
+          triggerTooltip.style.transform = "translateY(50%) scale(1.1)";
           triggerTooltipVisible = true;
         }
       } else if (!isInZone && isOpen) {
-        // Close widget when moving away from zone
         closeWidget();
-      } else if (!isInZone) {
-        if (triggerTooltipVisible) {
-          triggerTooltip.style.opacity = "0";
-          triggerTooltip.style.transform = "scale(0.9)";
-          triggerTooltipVisible = false;
-        }
+      } else if (!isInZone && triggerTooltipVisible) {
+        triggerTooltip.style.opacity = "0";
+        triggerTooltip.style.transform = "translateY(50%) scale(0.9)";
+        triggerTooltipVisible = false;
       }
     });
 
-    // Close when clicking elsewhere on the page
+    // Close on outside click
     document.addEventListener("click", function(e) {
-      if (isOpen && !triggerEl.contains(e.target)) {
-        // Check if click was on a channel icon
-        var onChannel = channelEls.some(function(item) {
-          return item.el.contains(e.target);
-        });
-        if (!onChannel) {
-          closeWidget();
-        }
-      }
+      if (!isOpen) return;
+      var onChannel = channelEls.some(function(item) { return item.el.contains(e.target); });
+      if (!triggerEl.contains(e.target) && !onChannel) closeWidget();
     });
   }
 
-  // Initialize when DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", createWidget);
   } else {
