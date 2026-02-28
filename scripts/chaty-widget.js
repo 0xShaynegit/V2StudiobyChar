@@ -76,29 +76,43 @@
     ].join(";");
     triggerEl.innerHTML = triggerSvg;
 
-    // Hover scale
-    triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.1)"; };
-    triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
+    // Add grayscale filter to trigger SVG
+    var triggerSvgEl = triggerEl.querySelector("svg");
+    if (triggerSvgEl) {
+      triggerSvgEl.style.filter = "grayscale(100%)";
+      triggerSvgEl.style.transition = "filter 0.2s ease";
+    }
 
-    // Create trigger tooltip
+    // Hover scale and color
+    triggerEl.onmouseenter = function() {
+      triggerEl.style.transform = "scale(1.1)";
+      if (triggerSvgEl) triggerSvgEl.style.filter = "grayscale(0%)";
+    };
+    triggerEl.onmouseleave = function() {
+      triggerEl.style.transform = "scale(1)";
+      if (triggerSvgEl) triggerSvgEl.style.filter = "grayscale(100%)";
+    };
+
+    // Create trigger tooltip positioned from right edge
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
       "position:fixed",
       "bottom:" + (bottomOffset + iconSize / 2 - 12) + "px",
-      "left:" + (leftOffset + iconSize + 20) + "px",
+      "right:20px",
       "text-align:center",
-      "background:rgba(0,0,0,0.9)",
+      "background:#C08A74",
       "color:#fff",
       "padding:8px 12px",
       "border-radius:4px",
-      "font-size:13px",
-      "font-weight:500",
+      "font-size:14px",
+      "font-weight:300",
       "z-index:10009",
       "opacity:0",
       "pointer-events:none",
       "transition:opacity 0.3s ease",
       "white-space:nowrap",
-      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
+      "font-family:Inter,sans-serif",
+      "letter-spacing:0.3px"
     ].join(";");
     triggerTooltip.textContent = "Contact us";
     document.body.appendChild(triggerTooltip);
@@ -139,41 +153,47 @@
       link.style.position = "relative";
       link.innerHTML = ch.svg;
 
-      // Make SVG fill the link
+      // Make SVG fill the link with grayscale by default
       var svgEl = link.querySelector("svg");
       if (svgEl) {
         svgEl.setAttribute("width", iconSize);
         svgEl.setAttribute("height", iconSize);
+        svgEl.style.filter = "grayscale(100%)";
+        svgEl.style.transition = "filter 0.2s ease";
       }
 
-      // Create centered tooltip for this channel (20px right of center)
+      // Create tooltip positioned from right edge
       var channelTooltip = document.createElement("div");
       channelTooltip.style.cssText = [
-        "position:absolute",
-        "top:50%",
-        "left:calc(50% + 20px)",
-        "transform:translate(-50%, -50%)",
-        "background:rgba(0,0,0,0.9)",
+        "position:fixed",
+        "top:auto",
+        "bottom:" + (bottomOffset + iconSize + itemGap + idx * (iconSize + itemGap) - 8) + "px",
+        "right:20px",
+        "background:#C08A74",
         "color:#fff",
         "padding:8px 12px",
         "border-radius:4px",
-        "font-size:13px",
-        "font-weight:500",
+        "font-size:14px",
+        "font-weight:300",
         "z-index:10008",
         "opacity:0",
         "pointer-events:none",
         "transition:opacity 0.2s ease",
         "white-space:nowrap",
-        "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
+        "font-family:Inter,sans-serif",
+        "letter-spacing:0.3px"
       ].join(";");
       channelTooltip.textContent = ch.label;
+      document.body.appendChild(channelTooltip);
 
-      // Show/hide tooltip on hover
+      // Show/hide tooltip and color on hover
       link.addEventListener("mouseenter", function() {
         channelTooltip.style.opacity = "1";
+        if (svgEl) svgEl.style.filter = "grayscale(0%)";
       });
       link.addEventListener("mouseleave", function() {
         channelTooltip.style.opacity = "0";
+        if (svgEl) svgEl.style.filter = "grayscale(100%)";
       });
 
       link.appendChild(channelTooltip);
@@ -229,14 +249,17 @@
       }
     };
 
-    // Show tooltip when mouse enters bottom 30% corner
+    // Show tooltip when mouse enters bottom 40% and right 40% corner
     document.addEventListener("mousemove", function(e) {
       var viewportHeight = window.innerHeight;
-      var bottomThreshold = viewportHeight * 0.3; // bottom 30%
-      var isInBottomArea = e.clientY > (viewportHeight - bottomThreshold);
-      var isInLeftCorner = e.clientX < 150; // within ~150px from left edge
+      var viewportWidth = window.innerWidth;
+      var bottomThreshold = viewportHeight * 0.4; // bottom 40%
+      var rightThreshold = viewportWidth * 0.4;   // right 40%
 
-      if (isInBottomArea && isInLeftCorner && !isOpen) {
+      var isInBottomArea = e.clientY > (viewportHeight - bottomThreshold);
+      var isInRightSide = e.clientX > (viewportWidth - rightThreshold);
+
+      if (isInBottomArea && isInRightSide && !isOpen) {
         if (!triggerTooltipVisible) {
           triggerTooltip.style.opacity = "1";
           triggerTooltipVisible = true;
