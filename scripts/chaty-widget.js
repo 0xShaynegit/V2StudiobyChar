@@ -75,7 +75,14 @@
     var autoCloseTimer = null;
     var channelEls = [];
     var triggerTooltipVisible = false;
-    var lastTouchTime = 0;
+
+    // Detect if device supports touch
+    var isTouchDevice = function() {
+      return (('ontouchstart' in window) ||
+              (navigator.maxTouchPoints > 0) ||
+              (navigator.msMaxTouchPoints > 0));
+    };
+    var hasTouchSupport = isTouchDevice();
 
     // --- Trigger button (FIXED, never moves) ---
     var triggerEl = document.createElement("div");
@@ -94,20 +101,27 @@
     ].join(";");
     triggerEl.innerHTML = triggerSvg;
 
-    // Hover: scale + open icons (trigger stays brown)
-    triggerEl.onmouseenter = function() {
-      triggerEl.style.transform = "scale(1.15)";
-      if (!isOpen) openWidget();
-    };
-    triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
+    if (!hasTouchSupport) {
+      // Desktop: use hover to open
+      triggerEl.onmouseenter = function() {
+        triggerEl.style.transform = "scale(1.15)";
+        if (!isOpen) openWidget();
+      };
+      triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
+    }
 
-    // Touch support for mobile
-    triggerEl.ontouchstart = function() {
-      triggerEl.style.transform = "scale(1.15)";
-      if (!isOpen) openWidget();
-      lastTouchTime = Date.now();
-    };
-    triggerEl.ontouchend = function() { triggerEl.style.transform = "scale(1)"; };
+    // Mobile/Touch: tap to toggle
+    if (hasTouchSupport) {
+      triggerEl.ontouchstart = function(e) {
+        e.preventDefault();
+        triggerEl.style.transform = "scale(1.15)";
+        if (!isOpen) openWidget();
+      };
+      triggerEl.ontouchend = function(e) {
+        e.preventDefault();
+        triggerEl.style.transform = "scale(1)";
+      };
+    }
 
     // --- Trigger tooltip ---
     // Center aligned: bottom positions the BOTTOM edge of the tooltip.
@@ -234,12 +248,13 @@
       if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
     }
 
-    triggerEl.onclick = function(e) {
-      e.stopPropagation();
-      // Ignore click if it happened right after a touch (mobile)
-      if (Date.now() - lastTouchTime < 500) return;
-      isOpen ? closeWidget() : openWidget();
-    };
+    // Click handler for desktop only (mobile uses touch)
+    if (!hasTouchSupport) {
+      triggerEl.onclick = function(e) {
+        e.stopPropagation();
+        isOpen ? closeWidget() : openWidget();
+      };
+    }
 
     // --- Corner hover: "Contact us" tooltip + zone-exit close ---
     document.addEventListener("mousemove", function(e) {

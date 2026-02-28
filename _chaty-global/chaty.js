@@ -67,7 +67,14 @@
     var autoCloseTimer = null;
     var channelEls = [];
     var triggerTooltipVisible = false;
-    var lastTouchTime = 0;
+
+    // Detect if device supports touch
+    var isTouchDevice = function() {
+      return (('ontouchstart' in window) ||
+              (navigator.maxTouchPoints > 0) ||
+              (navigator.msMaxTouchPoints > 0));
+    };
+    var hasTouchSupport = isTouchDevice();
 
     var triggerSvg = '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="19.5" cy="19.5" r="19.5" fill="' + config.accentColor + '"/><path d="M26.4 13H13.6C12.72 13 12 13.72 12 14.6V23.4C12 24.28 12.72 25 13.6 25H16L19.5 28L23 25H26.4C27.28 25 28 24.28 28 23.4V14.6C28 13.72 27.28 13 26.4 13Z" fill="white"/><circle cx="15.5" cy="19" r="1.25" fill="' + config.accentColor + '"/><circle cx="19.5" cy="19" r="1.25" fill="' + config.accentColor + '"/><circle cx="23.5" cy="19" r="1.25" fill="' + config.accentColor + '"/></svg>';
 
@@ -89,19 +96,27 @@
     ].join(";");
     triggerEl.innerHTML = triggerSvg;
 
-    triggerEl.onmouseenter = function() {
-      triggerEl.style.transform = "scale(1.15)";
-      if (!isOpen) openWidget();
-    };
-    triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
+    if (!hasTouchSupport) {
+      // Desktop: use hover to open
+      triggerEl.onmouseenter = function() {
+        triggerEl.style.transform = "scale(1.15)";
+        if (!isOpen) openWidget();
+      };
+      triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
+    }
 
-    // Touch support for mobile
-    triggerEl.ontouchstart = function() {
-      triggerEl.style.transform = "scale(1.15)";
-      if (!isOpen) openWidget();
-      lastTouchTime = Date.now();
-    };
-    triggerEl.ontouchend = function() { triggerEl.style.transform = "scale(1)"; };
+    // Mobile/Touch: tap to toggle
+    if (hasTouchSupport) {
+      triggerEl.ontouchstart = function(e) {
+        e.preventDefault();
+        triggerEl.style.transform = "scale(1.15)";
+        if (!isOpen) openWidget();
+      };
+      triggerEl.ontouchend = function(e) {
+        e.preventDefault();
+        triggerEl.style.transform = "scale(1)";
+      };
+    }
 
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
@@ -231,12 +246,13 @@
       if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
     }
 
-    triggerEl.onclick = function(e) {
-      e.stopPropagation();
-      // Ignore click if it happened right after a touch (mobile)
-      if (Date.now() - lastTouchTime < 500) return;
-      isOpen ? closeWidget() : openWidget();
-    };
+    // Click handler for desktop only (mobile uses touch)
+    if (!hasTouchSupport) {
+      triggerEl.onclick = function(e) {
+        e.stopPropagation();
+        isOpen ? closeWidget() : openWidget();
+      };
+    }
 
     if (config.zoneDetection) {
       document.addEventListener("mousemove", function(e) {
