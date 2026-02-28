@@ -110,7 +110,7 @@
       triggerEl.ontouchstart = function(e) {
         e.preventDefault();
         triggerEl.style.transform = "scale(1.15)";
-        if (!isOpen) openWidget();
+        isOpen ? closeWidget() : openWidget();
       };
       triggerEl.ontouchend = function(e) {
         e.preventDefault();
