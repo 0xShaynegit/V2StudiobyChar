@@ -80,12 +80,12 @@
     triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.15)"; };
     triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
-    // Create trigger tooltip positioned 20px from center of trigger, aligned to middle vertically
+    // Create trigger tooltip positioned 30px from edge of trigger, aligned to middle vertically
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
       "position:fixed",
       "bottom:" + (bottomOffset + iconSize / 2 - 12) + "px",
-      "left:" + (leftOffset + (iconSize / 2) + 20) + "px",
+      "left:" + (leftOffset + iconSize + 30) + "px",
       "text-align:center",
       "background:#C08A74",
       "color:#fff",
@@ -151,13 +151,12 @@
         svgEl.style.transition = "filter 0.2s ease";
       }
 
-      // Create tooltip positioned absolutely 20px from center of icon
+      // Create tooltip positioned absolutely 30px from edge of icon, vertically centered
       var channelTooltip = document.createElement("div");
       channelTooltip.style.cssText = [
         "position:absolute",
         "top:50%",
-        "left:" + ((iconSize / 2) + 20) + "px",
-        "transform:translateY(-50%)",
+        "left:" + (iconSize + 30) + "px",
         "background:#C08A74",
         "color:#fff",
         "padding:8px 12px",
@@ -171,7 +170,7 @@
         "white-space:nowrap",
         "font-family:Inter,sans-serif",
         "letter-spacing:0.3px",
-        "transform:scale(0.9) translateY(-50%)",
+        "transform:translateY(-50%) scale(0.9)",
         "transform-origin:left center"
       ].join(";");
       channelTooltip.textContent = ch.label;
