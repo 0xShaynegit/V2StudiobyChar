@@ -1,6 +1,6 @@
 {
   "name": "@studiobychar/chaty-widget",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Universal floating contact widget - install once, use everywhere",
   "main": "chaty.js",
   "files": [

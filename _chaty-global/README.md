@@ -2,6 +2,9 @@
 
 A lightweight, configurable floating contact widget that can be installed on any website with a single script tag. Features a smooth, modern design with customizable colors, channels, and behavior.
 
+**Version:** 1.1.0
+**Status:** Production Ready ✓
+
 ## Features
 
 - **Fixed Positioning**: Trigger button stays in place while scrolling
@@ -198,7 +201,7 @@ window.ChatyConfig = {
 
 ## Behavior
 
-### Interaction Flow
+### Desktop Interaction
 
 1. **Hover on trigger button**: Widget expands with animation
    - Trigger button scales to 115%
@@ -214,7 +217,24 @@ window.ChatyConfig = {
 
 4. **Move away from widget**:
    - If `zoneDetection: true`, widget closes when moving beyond bottom 40% and left 40% of screen
-   - Otherwise, requires explicit close click
+   - Otherwise, widget closes when mouse leaves the widget area
+
+5. **Click outside**: Widget closes immediately
+
+6. **Auto-close**: Widget closes after `autoClose` milliseconds of inactivity
+
+### Mobile/Touch Interaction
+
+1. **Tap trigger button**: Widget expands with animation
+   - Trigger button scales to 115%
+   - Channel icons appear above with staggered animation
+   - "Contact us" tooltip appears
+
+2. **Tap trigger button again**: Widget closes with animation
+
+3. **Tap on channel icon**: Opens link in new tab
+
+4. **Tap outside widget**: Widget closes immediately
 
 5. **Auto-close**: Widget closes after `autoClose` milliseconds of inactivity
 
