@@ -76,8 +76,8 @@
     ].join(";");
     triggerEl.innerHTML = triggerSvg;
 
-    // Hover scale (trigger button stays brown, no grayscale)
-    triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.1)"; };
+    // Hover scale and expand (trigger button stays brown, no grayscale)
+    triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.15)"; };
     triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
     // Create trigger tooltip positioned 20px from center of trigger, aligned to middle vertically
@@ -126,7 +126,7 @@
         "opacity:0",
         "pointer-events:none",
         "line-height:0",
-        "transition:bottom 0.3s ease, opacity 0.3s ease"
+        "transition:bottom 0.3s ease, opacity 0.3s ease, transform 0.2s ease"
       ].join(";");
 
       var link = document.createElement("a");
@@ -177,15 +177,17 @@
       channelTooltip.textContent = ch.label;
       document.body.appendChild(channelTooltip);
 
-      // Show/hide tooltip and color on hover
+      // Show/hide tooltip and color on hover, expand icon
       link.addEventListener("mouseenter", function() {
         channelTooltip.style.opacity = "1";
         channelTooltip.style.transform = "scale(1.1)";
+        itemEl.style.transform = "scale(1.15)";
         if (svgEl) svgEl.style.filter = "grayscale(0%)";
       });
       link.addEventListener("mouseleave", function() {
         channelTooltip.style.opacity = "0";
         channelTooltip.style.transform = "scale(0.9)";
+        itemEl.style.transform = "scale(1)";
         if (svgEl) svgEl.style.filter = "grayscale(100%)";
       });
 
@@ -243,6 +245,7 @@
     };
 
     // Show tooltip when mouse enters bottom 40% and left 40% corner
+    // Close widget when leaving the zone
     document.addEventListener("mousemove", function(e) {
       var viewportHeight = window.innerHeight;
       var viewportWidth = window.innerWidth;
@@ -251,14 +254,18 @@
 
       var isInBottomArea = e.clientY > (viewportHeight - bottomThreshold);
       var isInLeftSide = e.clientX < leftThreshold;
+      var isInZone = isInBottomArea && isInLeftSide;
 
-      if (isInBottomArea && isInLeftSide && !isOpen) {
+      if (isInZone && !isOpen) {
         if (!triggerTooltipVisible) {
           triggerTooltip.style.opacity = "1";
           triggerTooltip.style.transform = "scale(1.1)";
           triggerTooltipVisible = true;
         }
-      } else {
+      } else if (!isInZone && isOpen) {
+        // Close widget when moving away from zone
+        closeWidget();
+      } else if (!isInZone) {
         if (triggerTooltipVisible) {
           triggerTooltip.style.opacity = "0";
           triggerTooltip.style.transform = "scale(0.9)";
