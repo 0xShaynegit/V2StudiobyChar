@@ -75,6 +75,7 @@
     var autoCloseTimer = null;
     var channelEls = [];
     var triggerTooltipVisible = false;
+    var lastTouchTime = 0;
 
     // --- Trigger button (FIXED, never moves) ---
     var triggerEl = document.createElement("div");
@@ -104,6 +105,7 @@
     triggerEl.ontouchstart = function() {
       triggerEl.style.transform = "scale(1.15)";
       if (!isOpen) openWidget();
+      lastTouchTime = Date.now();
     };
     triggerEl.ontouchend = function() { triggerEl.style.transform = "scale(1)"; };
 
@@ -234,6 +236,8 @@
 
     triggerEl.onclick = function(e) {
       e.stopPropagation();
+      // Ignore click if it happened right after a touch (mobile)
+      if (Date.now() - lastTouchTime < 500) return;
       isOpen ? closeWidget() : openWidget();
     };
 
