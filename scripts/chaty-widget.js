@@ -57,6 +57,7 @@
     var isOpen = false;
     var autoCloseTimer = null;
     var channelEls = [];
+    var triggerTooltipVisible = false;
 
     // --- Trigger button (FIXED, never moves) ---
     var triggerEl = document.createElement("div");
@@ -78,6 +79,29 @@
     // Hover scale
     triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.1)"; };
     triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
+
+    // Create trigger tooltip
+    var triggerTooltip = document.createElement("div");
+    triggerTooltip.style.cssText = [
+      "position:fixed",
+      "bottom:" + (bottomOffset + iconSize / 2 - 10) + "px",
+      "left:" + (leftOffset + iconSize / 2 - 50) + "px",
+      "width:100px",
+      "text-align:center",
+      "background:#333",
+      "color:#fff",
+      "padding:5px 10px",
+      "border-radius:4px",
+      "font-size:12px",
+      "z-index:10009",
+      "opacity:0",
+      "pointer-events:none",
+      "transition:opacity 0.3s ease",
+      "white-space:nowrap",
+      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
+    ].join(";");
+    triggerTooltip.textContent = "Contact us";
+    document.body.appendChild(triggerTooltip);
 
     document.body.appendChild(triggerEl);
 
@@ -112,6 +136,7 @@
       link.style.height = iconSize + "px";
       link.style.borderRadius = "50%";
       link.style.lineHeight = "0";
+      link.style.position = "relative";
       link.innerHTML = ch.svg;
 
       // Make SVG fill the link
@@ -121,9 +146,36 @@
         svgEl.setAttribute("height", iconSize);
       }
 
-      // Tooltip
-      link.title = ch.label;
+      // Create centered tooltip for this channel
+      var channelTooltip = document.createElement("div");
+      channelTooltip.style.cssText = [
+        "position:absolute",
+        "top:50%",
+        "left:50%",
+        "transform:translate(-50%, -50%)",
+        "background:rgba(0,0,0,0.9)",
+        "color:#fff",
+        "padding:4px 8px",
+        "border-radius:3px",
+        "font-size:11px",
+        "z-index:10008",
+        "opacity:0",
+        "pointer-events:none",
+        "transition:opacity 0.2s ease",
+        "white-space:nowrap",
+        "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
+      ].join(";");
+      channelTooltip.textContent = ch.label;
 
+      // Show/hide tooltip on hover
+      link.addEventListener("mouseenter", function() {
+        channelTooltip.style.opacity = "1";
+      });
+      link.addEventListener("mouseleave", function() {
+        channelTooltip.style.opacity = "0";
+      });
+
+      link.appendChild(channelTooltip);
       itemEl.appendChild(link);
       document.body.appendChild(itemEl);
 
@@ -175,6 +227,26 @@
         openWidget();
       }
     };
+
+    // Show tooltip when mouse enters bottom 30% corner
+    document.addEventListener("mousemove", function(e) {
+      var viewportHeight = window.innerHeight;
+      var bottomThreshold = viewportHeight * 0.3; // bottom 30%
+      var isInBottomArea = e.clientY > (viewportHeight - bottomThreshold);
+      var isInLeftCorner = e.clientX < 150; // within ~150px from left edge
+
+      if (isInBottomArea && isInLeftCorner && !isOpen) {
+        if (!triggerTooltipVisible) {
+          triggerTooltip.style.opacity = "1";
+          triggerTooltipVisible = true;
+        }
+      } else {
+        if (triggerTooltipVisible) {
+          triggerTooltip.style.opacity = "0";
+          triggerTooltipVisible = false;
+        }
+      }
+    });
 
     // Close when clicking elsewhere on the page
     document.addEventListener("click", function(e) {
