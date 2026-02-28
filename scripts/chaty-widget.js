@@ -96,10 +96,12 @@
       "z-index:10009",
       "opacity:0",
       "pointer-events:none",
-      "transition:opacity 0.3s ease",
+      "transition:opacity 0.3s ease, transform 0.2s ease",
       "white-space:nowrap",
       "font-family:Inter,sans-serif",
-      "letter-spacing:0.3px"
+      "letter-spacing:0.3px",
+      "transform:scale(0.9)",
+      "transform-origin:left center"
     ].join(";");
     triggerTooltip.textContent = "Contact us";
     document.body.appendChild(triggerTooltip);
@@ -165,10 +167,12 @@
         "z-index:10008",
         "opacity:0",
         "pointer-events:none",
-        "transition:opacity 0.2s ease",
+        "transition:opacity 0.2s ease, transform 0.2s ease",
         "white-space:nowrap",
         "font-family:Inter,sans-serif",
-        "letter-spacing:0.3px"
+        "letter-spacing:0.3px",
+        "transform:scale(0.9)",
+        "transform-origin:left center"
       ].join(";");
       channelTooltip.textContent = ch.label;
       document.body.appendChild(channelTooltip);
@@ -176,10 +180,12 @@
       // Show/hide tooltip and color on hover
       link.addEventListener("mouseenter", function() {
         channelTooltip.style.opacity = "1";
+        channelTooltip.style.transform = "scale(1.1)";
         if (svgEl) svgEl.style.filter = "grayscale(0%)";
       });
       link.addEventListener("mouseleave", function() {
         channelTooltip.style.opacity = "0";
+        channelTooltip.style.transform = "scale(0.9)";
         if (svgEl) svgEl.style.filter = "grayscale(100%)";
       });
 
@@ -249,11 +255,13 @@
       if (isInBottomArea && isInLeftSide && !isOpen) {
         if (!triggerTooltipVisible) {
           triggerTooltip.style.opacity = "1";
+          triggerTooltip.style.transform = "scale(1.1)";
           triggerTooltipVisible = true;
         }
       } else {
         if (triggerTooltipVisible) {
           triggerTooltip.style.opacity = "0";
+          triggerTooltip.style.transform = "scale(0.9)";
           triggerTooltipVisible = false;
         }
       }
