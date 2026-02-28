@@ -76,29 +76,16 @@
     ].join(";");
     triggerEl.innerHTML = triggerSvg;
 
-    // Add grayscale filter to trigger SVG
-    var triggerSvgEl = triggerEl.querySelector("svg");
-    if (triggerSvgEl) {
-      triggerSvgEl.style.filter = "grayscale(100%)";
-      triggerSvgEl.style.transition = "filter 0.2s ease";
-    }
+    // Hover scale (trigger button stays brown, no grayscale)
+    triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.1)"; };
+    triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
-    // Hover scale and color
-    triggerEl.onmouseenter = function() {
-      triggerEl.style.transform = "scale(1.1)";
-      if (triggerSvgEl) triggerSvgEl.style.filter = "grayscale(0%)";
-    };
-    triggerEl.onmouseleave = function() {
-      triggerEl.style.transform = "scale(1)";
-      if (triggerSvgEl) triggerSvgEl.style.filter = "grayscale(100%)";
-    };
-
-    // Create trigger tooltip positioned from right edge
+    // Create trigger tooltip positioned 20px left of trigger, aligned to middle vertically
     var triggerTooltip = document.createElement("div");
     triggerTooltip.style.cssText = [
       "position:fixed",
       "bottom:" + (bottomOffset + iconSize / 2 - 12) + "px",
-      "right:20px",
+      "left:" + (leftOffset + iconSize + 20) + "px",
       "text-align:center",
       "background:#C08A74",
       "color:#fff",
@@ -162,13 +149,13 @@
         svgEl.style.transition = "filter 0.2s ease";
       }
 
-      // Create tooltip positioned from right edge
+      // Create tooltip positioned 20px left of icon, aligned to middle vertically
+      var tooltipBottom = bottomOffset + iconSize + itemGap + idx * (iconSize + itemGap) - (iconSize / 2 + 8);
       var channelTooltip = document.createElement("div");
       channelTooltip.style.cssText = [
         "position:fixed",
-        "top:auto",
-        "bottom:" + (bottomOffset + iconSize + itemGap + idx * (iconSize + itemGap) - 8) + "px",
-        "right:20px",
+        "bottom:" + tooltipBottom + "px",
+        "left:" + (leftOffset + iconSize + 20) + "px",
         "background:#C08A74",
         "color:#fff",
         "padding:8px 12px",
@@ -249,17 +236,17 @@
       }
     };
 
-    // Show tooltip when mouse enters bottom 40% and right 40% corner
+    // Show tooltip when mouse enters bottom 40% and left 40% corner
     document.addEventListener("mousemove", function(e) {
       var viewportHeight = window.innerHeight;
       var viewportWidth = window.innerWidth;
       var bottomThreshold = viewportHeight * 0.4; // bottom 40%
-      var rightThreshold = viewportWidth * 0.4;   // right 40%
+      var leftThreshold = viewportWidth * 0.4;    // left 40%
 
       var isInBottomArea = e.clientY > (viewportHeight - bottomThreshold);
-      var isInRightSide = e.clientX > (viewportWidth - rightThreshold);
+      var isInLeftSide = e.clientX < leftThreshold;
 
-      if (isInBottomArea && isInRightSide && !isOpen) {
+      if (isInBottomArea && isInLeftSide && !isOpen) {
         if (!triggerTooltipVisible) {
           triggerTooltip.style.opacity = "1";
           triggerTooltipVisible = true;
