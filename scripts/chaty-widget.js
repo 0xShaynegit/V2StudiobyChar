@@ -1,27 +1,25 @@
 /**
- * Static Chaty Widget
- * Floating social contact buttons
+ * Static Chaty Widget – Studio by Char
+ * Floating social contact buttons (bottom-left)
+ * All elements use position:fixed so trigger button NEVER moves
  */
 (function () {
   "use strict";
 
-  // =====================================================
-  // CONFIGURE YOUR CHANNELS HERE
-  // =====================================================
   var channels = [
-    {
-      name: "Instagram",
-      label: "Instagram",
-      url: "https://www.instagram.com/studioby.char/",
-      color: "#E4405F",
-      svg: '<svg viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="19.4395" cy="19.4395" r="19.4395" fill="#E4405F"/><rect x="11" y="11" width="17" height="17" rx="5" stroke="white" stroke-width="1.8" fill="none"/><circle cx="19.5" cy="19.5" r="4" stroke="white" stroke-width="1.8" fill="none"/><circle cx="25" cy="14" r="1.2" fill="white"/></svg>'
-    },
     {
       name: "Facebook_Messenger",
       label: "Facebook Messenger",
       url: "https://m.me/1BsJcmAYLn",
       color: "#0084FF",
       svg: '<svg viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="19.4395" cy="19.4395" r="19.4395" fill="#0084FF"/><path d="M19.5 9.5C13.701 9.5 9 13.748 9 19.074c0 3.014 1.474 5.702 3.778 7.456V30l3.294-1.81c.878.244 1.81.376 2.778.376 5.799 0 10.5-4.248 10.5-9.574S25.299 9.5 19.5 9.5zm1.04 12.878l-2.674-2.852-5.22 2.852 5.74-6.096 2.74 2.852 5.154-2.852-5.74 6.096z" fill="white"/></svg>'
+    },
+    {
+      name: "Instagram",
+      label: "Instagram",
+      url: "https://www.instagram.com/studioby.char/",
+      color: "#E4405F",
+      svg: '<svg viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="19.4395" cy="19.4395" r="19.4395" fill="#E4405F"/><rect x="11" y="11" width="17" height="17" rx="5" stroke="white" stroke-width="1.8" fill="none"/><circle cx="19.5" cy="19.5" r="4" stroke="white" stroke-width="1.8" fill="none"/><circle cx="25" cy="14" r="1.2" fill="white"/></svg>'
     },
     {
       name: "LinkedIn",
@@ -32,136 +30,167 @@
     }
   ];
 
-  // =====================================================
-  // TRIGGER BUTTON COLOUR  (light brown accent)
-  // =====================================================
-  var TRIGGER_COLOR = "#C08A74";
+  var isMobile = window.innerWidth <= 480;
+  var iconSize = isMobile ? 40 : 54;
+  var itemGap = isMobile ? 10 : 12;  // gap between icons
+  var bottomOffset = 20;             // distance from bottom of viewport
+  var leftOffset = 20;               // distance from left of viewport
 
+  // Main trigger icon – light brown circle, white chat bubble
   var triggerSvg =
-    '<svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="19.5" cy="19.5" r="19.5" fill="' + TRIGGER_COLOR + '"/>' +
+    '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="19.5" cy="19.5" r="19.5" fill="#C08A74"/>' +
     '<path d="M26.4 13H13.6C12.72 13 12 13.72 12 14.6V23.4C12 24.28 12.72 25 13.6 25H16L19.5 28L23 25H26.4C27.28 25 28 24.28 28 23.4V14.6C28 13.72 27.28 13 26.4 13Z" fill="white"/>' +
-    '<circle cx="15.5" cy="19" r="1.25" fill="' + TRIGGER_COLOR + '"/>' +
-    '<circle cx="19.5" cy="19" r="1.25" fill="' + TRIGGER_COLOR + '"/>' +
-    '<circle cx="23.5" cy="19" r="1.25" fill="' + TRIGGER_COLOR + '"/>' +
+    '<circle cx="15.5" cy="19" r="1.25" fill="#C08A74"/>' +
+    '<circle cx="19.5" cy="19" r="1.25" fill="#C08A74"/>' +
+    '<circle cx="23.5" cy="19" r="1.25" fill="#C08A74"/>' +
     '</svg>';
 
+  // Close icon – light brown circle, white X
   var closeSvg =
-    '<svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="19.5" cy="19.5" r="19.5" fill="' + TRIGGER_COLOR + '"/>' +
+    '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="19.5" cy="19.5" r="19.5" fill="#C08A74"/>' +
     '<path d="M25 14L14 25M14 14L25 25" stroke="white" stroke-width="2.5" stroke-linecap="round"/>' +
     '</svg>';
 
-  // =====================================================
-  // POSITION: "left-position" = bottom-left, "" = bottom-right
-  // =====================================================
-  var POSITION_CLASS = "left-position";
-
-  // =====================================================
-  // ANIMATION: see table in guide for options
-  // =====================================================
-  var ANIMATION_CLASS = "chaty-animation-pulse";
-
-  // =====================================================
-  // TOOLTIP TEXT
-  // =====================================================
-  var TRIGGER_TOOLTIP = "Get in touch";
-
-  // =====================================================
-  // NO CHANGES NEEDED BELOW THIS LINE
-  // =====================================================
-
   function createWidget() {
-    var chaty = document.createElement("div");
-    chaty.className = "chaty active";
-    chaty.id = "chaty-widget";
+    var isOpen = false;
+    var autoCloseTimer = null;
+    var channelEls = [];
 
-    var widget = document.createElement("div");
-    widget.className = "chaty-widget " + POSITION_CLASS;
+    // --- Trigger button (FIXED, never moves) ---
+    var triggerEl = document.createElement("div");
+    triggerEl.id = "chaty-trigger";
+    triggerEl.style.cssText = [
+      "position:fixed",
+      "bottom:" + bottomOffset + "px",
+      "left:" + leftOffset + "px",
+      "width:" + iconSize + "px",
+      "height:" + iconSize + "px",
+      "border-radius:50%",
+      "cursor:pointer",
+      "z-index:10010",
+      "line-height:0",
+      "transition:transform 0.2s ease"
+    ].join(";");
+    triggerEl.innerHTML = triggerSvg;
 
-    var channelList = document.createElement("div");
-    channelList.className = "chaty-channel-list";
+    // Hover scale
+    triggerEl.onmouseenter = function() { triggerEl.style.transform = "scale(1.1)"; };
+    triggerEl.onmouseleave = function() { triggerEl.style.transform = "scale(1)"; };
 
-    channels.forEach(function (ch) {
-      var channel = document.createElement("div");
-      channel.className =
-        "chaty-channel " + ch.name + "-channel chaty-tooltip pos-" +
-        (POSITION_CLASS === "left-position" ? "right" : "left");
-      channel.setAttribute("data-hover", ch.label);
+    document.body.appendChild(triggerEl);
+
+    // --- Channel icons (FIXED, stacked above trigger) ---
+    channels.forEach(function(ch, idx) {
+      var itemEl = document.createElement("div");
+
+      // Calculate each icon's resting bottom position (above trigger)
+      var stackBottom = bottomOffset + iconSize + itemGap + idx * (iconSize + itemGap);
+
+      itemEl.style.cssText = [
+        "position:fixed",
+        "bottom:" + bottomOffset + "px",   // start at trigger position (hidden)
+        "left:" + leftOffset + "px",
+        "width:" + iconSize + "px",
+        "height:" + iconSize + "px",
+        "border-radius:50%",
+        "z-index:10009",
+        "opacity:0",
+        "pointer-events:none",
+        "line-height:0",
+        "transition:bottom 0.3s ease, opacity 0.3s ease"
+      ].join(";");
 
       var link = document.createElement("a");
       link.href = ch.url;
-      link.target = ch.name === "Phone" || ch.name === "SMS" ? "_self" : "_blank";
+      link.target = ch.name === "Phone" ? "_self" : "_blank";
       link.rel = "noopener noreferrer";
-      link.className = "chaty-svg";
       link.setAttribute("aria-label", ch.label);
+      link.style.display = "block";
+      link.style.width = iconSize + "px";
+      link.style.height = iconSize + "px";
+      link.style.borderRadius = "50%";
+      link.style.lineHeight = "0";
+      link.innerHTML = ch.svg;
 
-      var iconWrap = document.createElement("span");
-      iconWrap.className = "chaty-icon";
-      iconWrap.style.background = ch.color;
-      iconWrap.style.borderRadius = "50%";
-      iconWrap.style.display = "block";
-      iconWrap.style.width = "54px";
-      iconWrap.style.height = "54px";
-      iconWrap.innerHTML = ch.svg;
+      // Make SVG fill the link
+      var svgEl = link.querySelector("svg");
+      if (svgEl) {
+        svgEl.setAttribute("width", iconSize);
+        svgEl.setAttribute("height", iconSize);
+      }
 
-      link.appendChild(iconWrap);
-      channel.appendChild(link);
-      channelList.appendChild(channel);
+      // Tooltip
+      link.title = ch.label;
+
+      itemEl.appendChild(link);
+      document.body.appendChild(itemEl);
+
+      channelEls.push({ el: itemEl, bottom: stackBottom });
     });
 
-    widget.appendChild(channelList);
+    // --- Toggle function ---
+    function openWidget() {
+      isOpen = true;
+      triggerEl.innerHTML = closeSvg;
 
-    var trigger = document.createElement("div");
-    trigger.className = "chaty-i-trigger";
+      channelEls.forEach(function(item, idx) {
+        item.el.style.transitionDelay = (idx * 0.06) + "s";
+        item.el.style.bottom = item.bottom + "px";
+        item.el.style.opacity = "1";
+        item.el.style.pointerEvents = "auto";
+      });
 
-    var ctaMain = document.createElement("div");
-    ctaMain.className = "chaty-cta-main chaty-tooltip pos-" +
-      (POSITION_CLASS === "left-position" ? "right" : "left") +
-      " " + ANIMATION_CLASS;
-    ctaMain.setAttribute("data-hover", TRIGGER_TOOLTIP);
-    var ctaMainBtn = document.createElement("div");
-    ctaMainBtn.className = "chaty-cta-button";
-    ctaMainBtn.innerHTML = triggerSvg;
-    ctaMain.appendChild(ctaMainBtn);
+      // Auto-close after 30 seconds
+      if (autoCloseTimer) clearTimeout(autoCloseTimer);
+      autoCloseTimer = setTimeout(function() {
+        if (isOpen) closeWidget();
+      }, 30000);
+    }
 
-    var ctaClose = document.createElement("div");
-    ctaClose.className = "chaty-cta-close chaty-tooltip pos-" +
-      (POSITION_CLASS === "left-position" ? "right" : "left");
-    ctaClose.setAttribute("data-hover", "Hide");
-    var ctaCloseBtn = document.createElement("div");
-    ctaCloseBtn.className = "chaty-cta-button";
-    ctaCloseBtn.innerHTML = closeSvg;
-    ctaClose.appendChild(ctaCloseBtn);
+    function closeWidget() {
+      isOpen = false;
+      triggerEl.innerHTML = triggerSvg;
 
-    trigger.appendChild(ctaMain);
-    trigger.appendChild(ctaClose);
-    widget.appendChild(trigger);
-    chaty.appendChild(widget);
-    document.body.appendChild(chaty);
+      channelEls.forEach(function(item) {
+        item.el.style.transitionDelay = "0s";
+        // Slide off screen downward, not onto trigger button
+        item.el.style.bottom = "-" + (iconSize + 10) + "px";
+        item.el.style.opacity = "0";
+        item.el.style.pointerEvents = "none";
+      });
 
-    function toggle() {
-      widget.classList.toggle("chaty-open");
-      var items = channelList.querySelectorAll(".chaty-channel");
-      if (widget.classList.contains("chaty-open")) {
-        items.forEach(function (item, idx) {
-          item.style.transition = "0.3s ease " + idx * 0.06 + "s";
-          item.style.bottom = (items.length - idx) * 62 + "px";
-          item.style.opacity = "1";
-        });
-      } else {
-        items.forEach(function (item) {
-          item.style.transition = "0.25s ease";
-          item.style.bottom = "0px";
-          item.style.opacity = "0";
-        });
+      if (autoCloseTimer) {
+        clearTimeout(autoCloseTimer);
+        autoCloseTimer = null;
       }
     }
 
-    ctaMainBtn.addEventListener("click", toggle);
-    ctaCloseBtn.addEventListener("click", toggle);
+    triggerEl.onclick = function(e) {
+      e.stopPropagation();
+      if (isOpen) {
+        closeWidget();
+      } else {
+        openWidget();
+      }
+    };
+
+    // Close when clicking elsewhere on the page
+    document.addEventListener("click", function(e) {
+      if (isOpen && !triggerEl.contains(e.target)) {
+        // Check if click was on a channel icon
+        var onChannel = channelEls.some(function(item) {
+          return item.el.contains(e.target);
+        });
+        if (!onChannel) {
+          closeWidget();
+        }
+      }
+    });
   }
 
+  // Initialize when DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", createWidget);
   } else {
