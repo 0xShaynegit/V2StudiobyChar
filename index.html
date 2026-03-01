@@ -376,7 +376,8 @@
     <noscript><link rel="stylesheet" href="css/style.css"></noscript>
 
     <!-- Chaty Widget: Floating Contact Buttons -->
-    <link href="./css/chaty-front.min.css" rel="stylesheet"/>
+    <link href="./css/chaty-front.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="./css/chaty-front.min.css" rel="stylesheet"></noscript>
 </head>
 
 <body>
@@ -458,7 +459,8 @@
                                     images/studiobychar studio by char grey sofa minimalist-1300w.webp 1300w"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             alt="Lifestyle photo studio in Chiang Mai showing a minimalist grey sofa setup"
-                            class="mb-2">
+                            class="mb-2"
+                            fetchpriority="high">
                         <h3 class="mb-1">Rent The Space</h3>
                         <p class="mb-1 text-muted">Access our meticulously designed lifestyle sets for your own team.
                             From the airy natural light downstairs studio to our specialized multi-camera podcast
